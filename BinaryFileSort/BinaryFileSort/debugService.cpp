@@ -1,18 +1,21 @@
-
 #include "stdafx.h"
 #include "debugService.h"
 
 #define DEFAULT_INPUT "input.dat"
 #define TEST_NUMBER_COUNT 11
 
-void DebugService::CreateInputFile()
+using namespace std;
+
+void DebugService::CreateInputFile(const string& fileName = DEFAULT_INPUT)
 {
 	ofstream ofs;
-	ofs.open(DEFAULT_INPUT, ofstream::binary | ofstream::out);
-	unsigned long int* inputData = new unsigned long int[TEST_NUMBER_COUNT]{ 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5 };
-	ofs.write(reinterpret_cast<const char*>(inputData), TEST_NUMBER_COUNT*sizeof(unsigned long int));
+	ofs.open(fileName, ofstream::binary | ofstream::out);
+	array<uint32_t, TEST_NUMBER_COUNT> inputData = { 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5 };
+	/*ofs.write(reinterpret_cast<const char*>(inputData), TEST_NUMBER_COUNT*sizeof(uint32_t));*/
+	vector<uint32_t> inputDataVector(inputData.begin(), inputData.end());
+	ostream_iterator<std::uint32_t> output_iterator(ofs, "");
+	std::copy(inputData.begin(), inputData.end(), output_iterator);
 	ofs.close();
-	delete[] inputData;
 }
 void DebugService::ShowFile()
 {
@@ -20,10 +23,10 @@ void DebugService::ShowFile()
 	ifs.open(DEFAULT_INPUT, ofstream::binary | ofstream::in);
 	if (ifs.is_open())
 	{
-		size_t readBufferSize = TEST_NUMBER_COUNT * sizeof(unsigned long int);
+		size_t readBufferSize = TEST_NUMBER_COUNT * sizeof(uint32_t);
 		char* memblock = new char[readBufferSize];
 		ifs.read(memblock, readBufferSize);
-		unsigned long int* result = reinterpret_cast<unsigned long int*>(memblock);
+		uint32_t* result = reinterpret_cast<uint32_t*>(memblock);
 		for (int i = 0; i < TEST_NUMBER_COUNT; i++)
 		{
 			cout << result[i] << " ";

@@ -32,11 +32,11 @@
 int main()
 {
 	DebugService debugService;
-	debugService.CreateInputFile();
-
+	debugService.CreateInputFile("input1.dat");
+	/*
 	LargeBinaryFileSortClass binarySorter;
-	binarySorter.Sort();
-
+	binarySorter.Sort("input1.dat");
+	*/
     return 0;
 }
 

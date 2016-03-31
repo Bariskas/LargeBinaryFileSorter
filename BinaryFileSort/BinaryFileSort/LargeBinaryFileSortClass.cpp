@@ -12,13 +12,13 @@ LargeBinaryFileSortClass::LargeBinaryFileSortClass()
 
 }
 
-int LargeBinaryFileSortClass::Sort()
+int LargeBinaryFileSortClass::Sort(char* fileToSortName)
 {
-	DivideIntoSortedParts();
+	DivideIntoSortedParts(fileToSortName);
 	return 0;
 }
 
-void LargeBinaryFileSortClass::DivideIntoSortedParts()
+void LargeBinaryFileSortClass::DivideIntoSortedParts(char* fileToSortName)
 {
 	int fileCounter = 0;
 

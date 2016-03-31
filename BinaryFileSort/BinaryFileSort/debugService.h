@@ -1,10 +1,9 @@
 #pragma once
 
-using namespace std;
 
 class DebugService
 {
 public:
-	void CreateInputFile();
+	void CreateInputFile(const std::string &fileName);
 	void ShowFile();
 };
