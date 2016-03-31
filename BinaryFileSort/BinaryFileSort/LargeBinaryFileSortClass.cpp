@@ -1,49 +1,59 @@
 #include "stdafx.h"
 #include "LargeBinaryFileSortClass.h"
 
-LargeBinaryFileSortClass::LargeBinaryFileSortClass(string fileToSortPath = DEFAULT_INPUT)
-	: m_fileToSortPath(fileToSortPath)
+using namespace std;
+
+LargeBinaryFileSortClass::LargeBinaryFileSortClass(uint32_t chunkSize)
+	: m_chunkSize(chunkSize), m_sortedFilesCount(0)
 {
 
 }
 LargeBinaryFileSortClass::LargeBinaryFileSortClass()
-	: m_fileToSortPath(DEFAULT_INPUT)
+	: m_chunkSize(DEFAULT_CHUNK_SIZE), m_sortedFilesCount(0)
 {
 
 }
 
-int LargeBinaryFileSortClass::Sort(char* fileToSortName)
+int LargeBinaryFileSortClass::Sort(const std::string& inputFileToSortName, const std::string& outputSorterFileName)
 {
-	DivideIntoSortedParts(fileToSortName);
+	DivideIntoSortedParts(inputFileToSortName);
+	m_sortedFilesCount++;
 	return 0;
 }
 
-void LargeBinaryFileSortClass::DivideIntoSortedParts(char* fileToSortName)
+int LargeBinaryFileSortClass::DivideIntoSortedParts(const std::string& inputFileToSortName)
 {
-	int fileCounter = 0;
+	uint32_t fileCounter = 0;
 
-	ifstream inputFileToSortStream(m_fileToSortPath, ofstream::binary | ofstream::in);
+	ifstream inputFileToSortStream(inputFileToSortName, ofstream::binary | ofstream::in);
+
+
 	if (inputFileToSortStream.is_open())
 	{
 		bool endOfFile = false;
+		size_t bufferSize = 0;
+
+		inputFileToSortStream.seekg(inputFileToSortStream.cur, inputFileToSortStream.end);
+		int leastBytes = inputFileToSortStream.tellg();
+		inputFileToSortStream.seekg(inputFileToSortStream.beg, 0);
+		
+
+		leastBytes < m_chunkSize ? bufferSize = leastBytes : bufferSize = 20;
+
 		while (!endOfFile)
 		{
-			int chunkSize = 0;
-			int current = inputFileToSortStream.tellg();
-			inputFileToSortStream.seekg(inputFileToSortStream.cur, inputFileToSortStream.end);
-			int least = inputFileToSortStream.tellg();
-			inputFileToSortStream.seekg(current, 0);
-			least - current < DEFAULT_CHUNK_SIZE ? chunkSize = least - current - 1 : chunkSize = DEFAULT_CHUNK_SIZE;
-
-			if (chunkSize == 0)
+			if (leastBytes == 1)
 			{
 				endOfFile = true;
 				continue;
 			}
-
-			string tempFileName = "temp";
-			tempFileName = tempFileName + to_string(fileCounter++) + ".txt";
-			CreateNewUnsortedPart(tempFileName, inputFileToSortStream, chunkSize);
+			ostringstream oss;
+			oss << "temp" << m_sortedFilesCount << "_" << fileCounter << ".txt";
+			string tempFileName = oss.str();
+			CreateNewUnsortedPart(tempFileName, inputFileToSortStream, bufferSize);
+			fileCounter++;
+			leastBytes -= bufferSize;
+			leastBytes < m_chunkSize ? bufferSize = leastBytes - 1 : bufferSize = 20;
 		}
 	}
 	else
@@ -51,20 +61,24 @@ void LargeBinaryFileSortClass::DivideIntoSortedParts(char* fileToSortName)
 		cout << "failed open file" << endl;
 	}
 	inputFileToSortStream.close();
+	return fileCounter;
 }
 
-void LargeBinaryFileSortClass::CreateNewUnsortedPart(const string& tempFileName, ifstream& inputStream, const unsigned int chunkSize)
+void LargeBinaryFileSortClass::CreateNewUnsortedPart(const string& tempFileName, ifstream& inputStream, const unsigned int bufferSize)
 {
-	char* memBlock = new char[chunkSize];
+	//char* memBlock = new char[bufferSize];
 	ofstream ofs(tempFileName, ofstream::binary | ofstream::out);
 	
-	inputStream.read(memBlock, chunkSize);
+	//inputStream.read(memBlock, bufferSize);
 
-	SortPart(memBlock, chunkSize);
+	vector<uint32_t> buffer(bufferSize/4);
 
-	ofs.write(memBlock, chunkSize);
+	inputStream.read(reinterpret_cast<char*>(&buffer[0]), bufferSize);
+	sort(buffer.begin(), buffer.end());
 
-	delete[] memBlock;
+	ofs.write(reinterpret_cast<char*>(&buffer[0]), bufferSize);
+
+	//delete[] memBlock;
 	ofs.close();
 }
 

@@ -2,8 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "debugService.h"
+
 #include "LargeBinaryFileSortClass.h"
+
+#include "debugService.h"
+
+using namespace std;
 /*
 
 могу дать одну задачку для затравки:
@@ -29,14 +33,26 @@
 • Поощряется наличие тестов или скриптов для проверки работы программы в автоматическом
 режиме.
 */
+
 int main()
 {
 	DebugService debugService;
-	debugService.CreateInputFile("input1.dat");
-	/*
-	LargeBinaryFileSortClass binarySorter;
+	vector<uint32_t> inputData;
+	for (int i = 17; i > 0; --i)
+	{
+		inputData.push_back(i);
+	}
+	debugService.CreateInputFile("input1.dat", inputData);
+	for (int i = 0; i < 17; ++i)
+	{
+		inputData.push_back(i);
+	}
+	debugService.CreateInputFile("input2.dat", inputData);
+
+	uint32_t chunkSize = 20;
+	LargeBinaryFileSortClass binarySorter(chunkSize);
 	binarySorter.Sort("input1.dat");
-	*/
+	binarySorter.Sort("input2.dat");
     return 0;
 }
 

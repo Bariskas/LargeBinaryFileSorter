@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "debugService.h"
 
 #define DEFAULT_INPUT "input.dat"
@@ -6,15 +7,15 @@
 
 using namespace std;
 
-void DebugService::CreateInputFile(const string& fileName = DEFAULT_INPUT)
+void DebugService::CreateInputFile(const string& fileName, vector<uint32_t>& inputData)
 {
 	ofstream ofs;
 	ofs.open(fileName, ofstream::binary | ofstream::out);
-	array<uint32_t, TEST_NUMBER_COUNT> inputData = { 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5 };
-	/*ofs.write(reinterpret_cast<const char*>(inputData), TEST_NUMBER_COUNT*sizeof(uint32_t));*/
-	vector<uint32_t> inputDataVector(inputData.begin(), inputData.end());
-	ostream_iterator<std::uint32_t> output_iterator(ofs, "");
-	std::copy(inputData.begin(), inputData.end(), output_iterator);
+	//array<uint32_t, TEST_NUMBER_COUNT> inputData = { 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5 };
+	ofs.write(reinterpret_cast<const char*>(&inputData[0]), inputData.size()*sizeof(uint32_t));
+	//vector<uint32_t> inputDataVector(inputData.begin(), inputData.end());
+	//ostream_iterator<std::uint32_t> output_iterator(ofs, "");
+	//std::copy(inputData.begin(), inputData.end(), output_iterator);
 	ofs.close();
 }
 void DebugService::ShowFile()

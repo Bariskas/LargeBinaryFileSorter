@@ -15,6 +15,7 @@
 #include <iterator>
 #include <array>
 #include <vector>
+#include <sstream>
 #include <string>
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы
